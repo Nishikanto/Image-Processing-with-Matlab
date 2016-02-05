@@ -1,0 +1,188 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>EdgeBaseSegmentation</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-09-23"><meta name="DC.source" content="EdgeBaseSegmentation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1></h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Edge base Segmentation</a></li><li><a href="#6">Fill Interior Gaps</a></li><li><a href="#7">Remove Connected Objects on Border</a></li></ul></div><pre>Nishikanto Sarkar
+Reg No. 2012331071</pre><h2>Edge base Segmentation<a name="2"></a></h2><p>Detecting a Object Using edge base Image Segmentation</p><p><i>Read image from the link</i></p><pre class="codeinput">I = imread(<span class="string">'F:\Matlab\Matlab Works\Edge Base Segmentation\tiger.jpg'</span>);
+J = I;
+figure, imshow(I), title(<span class="string">'original image'</span>);
+I = rgb2gray(I); <span class="comment">%convert rgb to gray</span>
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_01.png" alt=""> <p>Here we use 'Roberts' operator to calculate the threshold value. We then tune the threshold value and use again to obtain a binary mask that contains the segmented object.</p><pre class="codeinput">[~, threshold] = edge(I, <span class="string">'Roberts'</span>);
+fudgeFactor = .4;
+BWs = edge(I,<span class="string">'Roberts'</span>, threshold*fudgeFactor);
+figure, imshow(BWs), title(<span class="string">'binary gradient mask'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_02.png" alt=""> <p>Compared to the orginal image, in binary gradient mask has gaps in lines surrounding the object in the gradient mask. These linear gaps will disapper if the sobel image is dilated using liner stucturing elements. This linear structuring elements can create with the strel function.</p><pre class="codeinput">se90 = strel(<span class="string">'line'</span>, 3, 90);
+se0 = strel(<span class="string">'line'</span>, 3, 0);
+
+<span class="comment">% Here we use imdilate function for dilating the binary gradient mask.</span>
+BWsdil = imdilate(BWs, [se90 se0]);
+figure, imshow(BWsdil), title(<span class="string">'dilated gradient mask'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_03.png" alt=""> <h2>Fill Interior Gaps<a name="6"></a></h2><p>We use imfill to fill interior gaps</p><pre class="codeinput">BWdfill = imfill(BWsdil, <span class="string">'holes'</span>);
+figure, imshow(BWdfill);
+title(<span class="string">'binary image with filled holes'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_04.png" alt=""> <h2>Remove Connected Objects on Border<a name="7"></a></h2><p>If there is object that connected to the border and that is not our object then we can remove it by using imclearborder function. The connectivity in the imclearborder function was set to 4 to remove diagonal connections.</p><pre class="codeinput">BWnobord = imclearborder(BWdfill, 4);
+figure, imshow(BWnobord), title(<span class="string">'cleared border image'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_05.png" alt=""> <p>imerode function is use to make the segmented object look natural. the image is eroding twice with a diamond structuring element and that is created by strel function.</p><pre class="codeinput">seD = strel(<span class="string">'diamond'</span>,2);
+BWfinal = imerode(BWnobord,seD);
+BWfinal = imerode(BWfinal,seD);
+figure, imshow(BWfinal), title(<span class="string">'segmented image'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_06.png" alt=""> <p>Here i display a yellow line in the original image for mark the object that we detected.</p><pre class="codeinput">BWoutline = bwperim(BWfinal);
+SegoutR = J(:,:,1);
+SegoutG = J(:,:,2);
+SegoutB = J(:,:,3);
+
+<span class="comment">%now set yellow, [255 255 0]</span>
+SegoutR(BWoutline) = 255;
+SegoutG(BWoutline) = 255;
+SegoutB(BWoutline) = 0;
+SegoutRGB = cat(3, SegoutR, SegoutG, SegoutB);
+figure, imshow(SegoutRGB), title(<span class="string">'outlined original image'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 67% 
+</pre><img vspace="5" hspace="5" src="EdgeBaseSegmentation_07.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+
+%%
+% 
+%  Nishikanto Sarkar
+%  Reg No. 2012331071
+% 
+%% Edge base Segmentation
+% Detecting a Object Using edge base Image Segmentation 
+
+%% 
+% _Read image from the link_ 
+I = imread('F:\Matlab\Matlab Works\Edge Base Segmentation\tiger.jpg');
+J = I;
+figure, imshow(I), title('original image');
+I = rgb2gray(I); %convert rgb to gray
+
+%% 
+% Here we use 'Roberts' operator to calculate the threshold value. We then
+% tune the threshold value and use again to obtain a binary mask that
+% contains the segmented object. 
+[~, threshold] = edge(I, 'Roberts');
+fudgeFactor = .4;
+BWs = edge(I,'Roberts', threshold*fudgeFactor);
+figure, imshow(BWs), title('binary gradient mask');
+
+%% 
+% Compared to the orginal image, in binary gradient mask has gaps in lines
+% surrounding the object in the gradient mask. These linear gaps will
+% disapper if the sobel image is dilated using liner stucturing elements.
+% This linear structuring elements can create with the strel function.  
+se90 = strel('line', 3, 90);
+se0 = strel('line', 3, 0);
+
+% Here we use imdilate function for dilating the binary gradient mask. 
+BWsdil = imdilate(BWs, [se90 se0]);
+figure, imshow(BWsdil), title('dilated gradient mask');
+
+%% Fill Interior Gaps
+% We use imfill to fill interior gaps
+BWdfill = imfill(BWsdil, 'holes');
+figure, imshow(BWdfill);
+title('binary image with filled holes');
+
+%% Remove Connected Objects on Border
+% If there is object that connected to the border and that is not our
+% object then we can remove it by using imclearborder function. The 
+% connectivity in the imclearborder function was set to 4 to remove 
+% diagonal connections.
+BWnobord = imclearborder(BWdfill, 4);
+figure, imshow(BWnobord), title('cleared border image');
+
+%% 
+% imerode function is use to make the segmented object look natural. 
+% the image is eroding twice with a diamond structuring element and that is
+% created by strel function. 
+seD = strel('diamond',2);
+BWfinal = imerode(BWnobord,seD);
+BWfinal = imerode(BWfinal,seD);
+figure, imshow(BWfinal), title('segmented image');
+
+%% 
+% Here i display a yellow line in the original image for mark the object
+% that we detected. 
+BWoutline = bwperim(BWfinal);
+SegoutR = J(:,:,1);
+SegoutG = J(:,:,2);
+SegoutB = J(:,:,3);
+
+%now set yellow, [255 255 0]
+SegoutR(BWoutline) = 255;
+SegoutG(BWoutline) = 255;
+SegoutB(BWoutline) = 0;
+SegoutRGB = cat(3, SegoutR, SegoutG, SegoutB);
+figure, imshow(SegoutRGB), title('outlined original image');
+##### SOURCE END #####
+--></body></html>
